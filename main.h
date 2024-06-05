@@ -22,5 +22,6 @@ typedef struct {
 
 #include "include/data_io.h"
 #include "include/sorting.h"
+#include "include/menu.h"
 
 #endif /* MAIN_H_ */
