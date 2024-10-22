@@ -2,10 +2,12 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -std=c90
 EXEC = main
 WORKDIR = src
-OBJDIR = obj
+OBJDIR = build
 
 SOURCES = $(wildcard $(WORKDIR)/*.c)
 OBJECTS = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.c=.o)))
+
+all: $(EXEC)
 
 run:
 	@$(CC) test.c -lncurses
