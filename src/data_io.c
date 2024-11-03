@@ -1,16 +1,29 @@
 #include <time.h>
 #include <stdio.h>
-#include "../include/data_io.h"
-#include "../main.h"
+#include "../include/main.h"
 
-void input(Fileinfo *file) {
-    input_filename(file);
-    input_size(&file->size);
-    input_date(&file->creation_time);
+int input(Fileinfo *folder, int *n, const int *i) {
+
+    if (!(folder && n)) {
+        return incorrect_parameters;
+    } else if (*n >= MAX_FILES) {
+        return length_error;
+    }
+
+    Fileinfo buff = {0};
+    int code = success;
+
+    input_filename(&buff);
+    input_size(&buff.size);
+    //input_date(&buff->creation_time);
+    
+    code = insert_file(folder, n, (i) ? *i : *n, &buff);
+
+    return code;
 }
 
 void input_filename(Fileinfo *file) {
-    char *point;
+    char *point = NULL;
     char buff[NAME_SIZE + EXT_SIZE];
 
     while (1) {
@@ -30,6 +43,7 @@ void input_filename(Fileinfo *file) {
             strcpy(file->extension, point);
             break;
         }
+
     }
 
 }
@@ -37,7 +51,7 @@ void input_filename(Fileinfo *file) {
 void input_size(double *size) {
     printf("Введите размер файла в КБ: ");
     while (scanf("%lf", size) != 1 || *size < 0) {
-        print_err("Размер не может быть отрицательным.");
+        print_err("Некорректное значение. Попробуй снова");
     }
 }
 
@@ -46,9 +60,11 @@ void input_date(Date *d) {
     while (1) {
         printf("Введите дату создания файла: ");
         k = scanf("%d.%d.%d", &d->day, &d->month, &d->year);
-        if (k != 3 || check_date(d)) {
-            print_err(NULL);
+        if (k != 3) {
+            print_err("Некорректный ввод, попробуй снова.");
             continue;
+        } else if (check_date(d)) {
+            print_err("Дата создания файла не может быть больше чем текущая дата компьютера.");
         }
         break;
     }
@@ -83,11 +99,55 @@ void print_date(const Date *d) {
 }
 
 void print_err(const char *msg) {
-    char ch;
     if (msg) {
-        fprintf(stderr, "Некорректный ввод. %s\n", msg);
-    } else {
-        fprintf(stderr, "Некорректный ввод.\n");
+        char ch;
+        fprintf(stderr, "%s\n", msg);
+        while (((ch = getchar()) != '\n') && (ch != EOF));
     }
-    while (((ch = getchar()) != '\n') && (ch != EOF));
+}
+
+int print_file(const Fileinfo *folder, const int n, const int i) {
+    int code = 0;
+
+    if (!folder || i < 0 || i >= n) {
+        code = 1;
+    } else {
+        printf("%d\t%s.%s\t%.1lf KiB\n", i, folder[i].name, folder[i].extension, folder[i].size); 
+    }
+    
+    return code;
+}
+
+int print_folder(const Fileinfo *folder, const int n) {
+    int code = 0, i;
+
+    if (!folder) {
+        code = 1;
+    } else {
+        printf("id\tНазвание файла\tРазмер файла\tДата создания\n");
+        for (i = 0; i < n; i++) {
+            print_file(folder, n, i);
+        }
+    }
+
+    return code;
+}
+
+char *get_error(const int code) {
+
+    char *msg = NULL;
+
+    switch (code) {
+    case incorrect_parameters:
+        msg = "Функция не должна принимать NULL\n";
+        break;
+    case length_error:
+        msg = "Выход за пределы массива\n";
+        break;
+    case bad_index:
+        msg = "Некорректный индекс\n";
+        break;
+    }
+
+    return msg;
 }

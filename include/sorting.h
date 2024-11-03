@@ -2,7 +2,7 @@
 #define SORTING_H_
 
 #include <string.h>
-#include "../main.h"
+#include "main.h"
 
 typedef int (*Comparator)(const Fileinfo *a, const Fileinfo *b, int sorting);
 

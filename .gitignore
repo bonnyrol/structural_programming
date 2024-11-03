@@ -1,5 +1,5 @@
 .vscode/
 *.out
 *.o
-obj/
+build/
 test.c

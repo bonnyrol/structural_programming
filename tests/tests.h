@@ -2,7 +2,7 @@
 #define TESTS_H_
 
 #include <check.h>
-#include "../main.h"
+#include "../include/main.h"
 
 
 #endif /*TESTS_H_*/
