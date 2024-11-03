@@ -1,18 +1,18 @@
 #include "../include/sorting.h"
 #include "../include/data_io.h"
 
-void sort(Fileinfo *a, int n, int mode, int sorting) {
+void sort(Folder *f, const int mode, const int sorting) {
     int i, j, noSwap;
     Fileinfo temp;
     Comparator compare = sort_routing(mode);
 
-    for (i = n - 1; compare && i >= 0; i--){
+    for (i = f->n - 1; compare && i >= 0; i--){
         noSwap = 1;
         for (j = 0; j < i; j++) {
-            if (compare(&a[j], &a[j + 1], sorting)) {
-                temp = a[j];
-                a[j] = a[j + 1];
-                a[j + 1] = temp;
+            if (compare(&f->file[j], &f->file[j + 1], sorting)) {
+                temp = f->file[j];
+                f->file[j] = f->file[j + 1];
+                f->file[j + 1] = temp;
                 noSwap = 0;
             }
         }
@@ -23,7 +23,7 @@ void sort(Fileinfo *a, int n, int mode, int sorting) {
     }
 }
 
-int (*sort_routing(int mode))(const Fileinfo *a, const Fileinfo *b, int sorting) {
+int (*sort_routing(const int mode))(const Fileinfo *a, const Fileinfo *b, int sorting) {
     Comparator result = NULL;
 
     switch (mode) {

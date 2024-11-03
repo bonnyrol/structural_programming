@@ -106,16 +106,15 @@ void print_err(const char *msg) {
     }
 }
 
-int print_file(const Fileinfo *file, const int i) {
+int print_file(const Fileinfo *file, const int i) { // NEED TO FIX THIS SHIT
     int code = 0;
 
-    printf("%d\t%s.%s\t%.1lf KiB\n", i, file->name, file->extension, file->size); 
-
+    printf("%d\t%s.%s\t%.1lf KiB\n", i, file->name, file->extension, file->size);  
     
     return code;
 }
 
-int print_folder(const Folder *f) {
+int print_folder(const Folder *f) { // AND THIS TOO
     int code = 0, i;
 
     if (!f) {
