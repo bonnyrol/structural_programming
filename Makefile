@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra# -std=c90
+CFLAGS = -Wall -Werror -Wextra -std=c90
 EXEC = main
 WORKDIR = src
 OBJDIR = build
@@ -20,12 +20,10 @@ $(OBJDIR)/%.o: $(WORKDIR)/%.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 valgrind: $(EXEC)
-	valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all -s ./$(EXEC)
+	valgrind --tool=memcheck --leak-check=yes ./$(EXEC)
 
 $(OBJDIR):	
 	mkdir $(OBJDIR)
-
-rebuild: clean $(EXEC)
 
 clean:
 	rm -rf *.o

@@ -1,13 +1,12 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define MAX_FILES 6
+#define MAX_FILES 64
 #define EXT_SIZE 5
-#define NAME_SIZE 100
+#define NAME_SIZE 255
 
 typedef enum {name, ext, size, datetime} mode; /* флаги для обозначния сортировки по типу.*/
 typedef enum {ascending, descending} sorting; /* Флаги для обозначения сортировки по возрастанию или убыванию. */
-typedef enum {success, incorrect_parameters, length_error, bad_index} errors;
 
 typedef struct {
     int day, month, year;
@@ -21,8 +20,7 @@ typedef struct {
     Date creation_time; /* Дата создания */
 } Fileinfo;
 
-#include "data_io.h"
-#include "sorting.h"
-#include "other.h"
+#include "include/data_io.h"
+#include "include/sorting.h"
 
 #endif /* MAIN_H_ */
