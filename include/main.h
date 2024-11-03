@@ -21,6 +21,13 @@ typedef struct {
     Date creation_time; /* Дата создания */
 } Fileinfo;
 
+typedef struct {
+    Fileinfo file[MAX_FILES];
+    int n;
+    double size;
+} Folder;
+
+
 #include "data_io.h"
 #include "sorting.h"
 #include "other.h"

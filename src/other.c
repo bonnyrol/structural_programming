@@ -1,63 +1,50 @@
 #include "../include/other.h"
 #include <string.h>
 
+int delete_file(Folder *f, const int i) {
 
-int delete_file(Fileinfo *folder, int *n, const int i) {
-
-    if (!folder || !n) {
+    if (!f) {
         return incorrect_parameters;
-    } else if (*n == 0) {
+    } else if (f->n == 0) {
         return length_error;
-    } else if (i < 0 || i >= *n) {
+    } else if (i < 0 || i >= f->n) {
         return bad_index;
     }
 
+    f->size -= f->file[i].size;
+
     if (i == 0) {
-        memmove(folder, folder + 1, (*n - 1) * sizeof(Fileinfo));
-    } else if (i != *n - 1) {
-        memmove(folder + i, folder + i + 1, (*n - i - 1) * sizeof(Fileinfo));
+        memmove(f->file, f->file + 1, (f->n - 1) * sizeof(Fileinfo));
+    } else if (i != f->n - 1) {
+        memmove(f->file + i, f->file + i + 1, (f->n - i - 1) * sizeof(Fileinfo));
     }
 
-    (*n)--;
-
+    f->n--;
     return success;
 }
 
-int insert_file(Fileinfo *folder, int *n, const int i, const Fileinfo *item) {
+int insert_file(Folder *f, const int i, const Fileinfo *item) {
     
-    if (!folder || !n || !item) {
+    if (!f || !item) {
         return incorrect_parameters;
-    } else if (*n + 1 > MAX_FILES) {
+    } else if (f->n + 1 > MAX_FILES) {
         return length_error;
     } else if (i < 0) {
         return bad_index;
     }
 
     if (!i) {
-        memmove(folder + 1, folder, *n * sizeof(Fileinfo));
-        folder[i] = *item;
-    } else if (i >= *n) {
-        folder[*n] = *item;
+        memmove(f->file + 1, f->file, f->n * sizeof(Fileinfo));
+        f->file[i] = *item;
+    } else if (i >= f->n) {
+        f->file[f->n] = *item;
     } else {
-        memmove(folder + i + 1, folder + i, (*n - i) * sizeof(Fileinfo));
-        folder[i] = *item;
+        memmove(f->file + i + 1, f->file + i, (f->n - i) * sizeof(Fileinfo));
+        f->file[i] = *item;
     }
 
-    (*n)++;
-
-    return success;
-}
-
-int get_total_size(const Fileinfo *folder, const int n, double *total) {
-
-    if (!folder || !total) {
-        return incorrect_parameters;
-    }
-
-    int i;
-    for (i = 0; i < n; i++) {
-        *total += folder[i].size;
-    }
+    f->n++;
+    f->size += item->size;
 
     return success;
 }
