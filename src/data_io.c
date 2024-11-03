@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include "../include/main.h"
 
-int input(Fileinfo *folder, int *n, const int *i) {
+int input(Folder *f, const int *i) {
 
-    if (!(folder && n)) {
+    if (!f) {
         return incorrect_parameters;
-    } else if (*n >= MAX_FILES) {
+    } else if (f->n >= MAX_FILES) {
         return length_error;
     }
 
@@ -17,7 +17,7 @@ int input(Fileinfo *folder, int *n, const int *i) {
     input_size(&buff.size);
     //input_date(&buff->creation_time);
     
-    code = insert_file(folder, n, (i) ? *i : *n, &buff);
+    code = insert_file(f, (i) ? *i : f->n, &buff);
 
     return code;
 }
@@ -106,27 +106,24 @@ void print_err(const char *msg) {
     }
 }
 
-int print_file(const Fileinfo *folder, const int n, const int i) {
+int print_file(const Fileinfo *file, const int i) {
     int code = 0;
 
-    if (!folder || i < 0 || i >= n) {
-        code = 1;
-    } else {
-        printf("%d\t%s.%s\t%.1lf KiB\n", i, folder[i].name, folder[i].extension, folder[i].size); 
-    }
+    printf("%d\t%s.%s\t%.1lf KiB\n", i, file->name, file->extension, file->size); 
+
     
     return code;
 }
 
-int print_folder(const Fileinfo *folder, const int n) {
+int print_folder(const Folder *f) {
     int code = 0, i;
 
-    if (!folder) {
+    if (!f) {
         code = 1;
     } else {
         printf("id\tНазвание файла\tРазмер файла\tДата создания\n");
-        for (i = 0; i < n; i++) {
-            print_file(folder, n, i);
+        for (i = 0; i < f->n; i++) {
+            print_file(&f->file[i], i);
         }
     }
 
