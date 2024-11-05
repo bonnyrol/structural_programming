@@ -35,7 +35,6 @@ int main() {
     return 0;
 }
 
-
 void cls() {
 #ifdef _WIN
     system("cls");
@@ -48,7 +47,7 @@ void menu() {
     printf("1. Создать новый файл\n");
     printf("2. Вывод всех файлов на экран\n");
     printf("3. Вывод файла на экран по индексу\n");
-    printf("4. Подсчёт всех элементов в списке\n");
+    printf("4. Вывод размера всех файлов в папке\n");
     printf("5. Сортировка файлов\n");
     printf("6. Вставка файла в любое место\n");
     printf("7. Удаление файла\n");
@@ -79,7 +78,8 @@ int input_int(char *msg) {
 int entry(Folder *folder) {
     int code = 1, choise = 0, value = 0;
     int error_code = 0;
-    // char ch = '\0';
+    mode a = 0; // name
+    sorting b = 0; // asc
 
     menu();
     choise = input_int("Выберите пункт: ");
@@ -110,6 +110,9 @@ int entry(Folder *folder) {
         break;
     case 5:
         printf("Сортировка\n");
+        a = input_int("Введите параметр для сортитровки: ");
+        b = input_int("Введите ");
+        sort(folder, a, b);
         break;
     case 6:
         value = input_int("Введите индекс для вставки: ");
