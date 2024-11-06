@@ -1,6 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "../include/main.h"
+#include "../include/table.h"
 
 int input(Folder *f, const int *i) {
 
@@ -106,27 +107,127 @@ void print_err(const char *msg) {
     }
 }
 
-int print_file(const Fileinfo *file, const int i) { // NEED TO FIX THIS SHIT
-    int code = 0;
+void print_folder2(const Folder *f) {
 
-    printf("%d\t%s.%s\t%.1lf KiB\n", i, file->name, file->extension, file->size);  
-    
-    return code;
-}
+    /* Данная переменная служит для отслеживания изменений в f */
+    static int prev_n = 0;
+    static size_t max_len[4] = {0};
 
-int print_folder(const Folder *f) { // AND THIS TOO
-    int code = 0, i;
+    /* Если были добавленны новые элементы, или мы вызываем эту функцию в первый раз */
+    if (prev_n != f->n || !prev_n) {
+        memset(max_len, 0, 4 * sizeof(size_t));
 
-    if (!f) {
-        code = 1;
-    } else {
-        printf("id\tНазвание файла\tРазмер файла\tДата создания\n");
-        for (i = 0; i < f->n; i++) {
-            print_file(&f->file[i], i);
+        for (int i = 0; i < f->n; i++) {
+            char id[10], size[15], date[11]; // Все не строковые элементы мы должны сохранить в виде строки
+
+            snprintf(id, 10, "%d", f->file[i].id);
+            snprintf(size, 15, "%.2lf", f->file[i].size);
+            snprintf(date, 11, "%02d/%02d/%d", f->file[i].creation_time.day, f->file[i].creation_time.month, f->file[i].creation_time.year);
+
+            size_t curr_len[4] = {strlen(id), strlen(f->file[i].name) + strlen(f->file[i].extension) + 1,  strlen(size),  strlen(date)};
+
+            for (int j = 0; j < 4; j++){
+                if (curr_len[j] > max_len[j]) {
+                    max_len[j] = curr_len[j]; 
+                }
+            }
+
+        }
+
+    }
+
+    const char field_name[4][11] = {"id", "filename", "file size", "created at"}; 
+    static Field ff[4] = {0};
+
+    if (prev_n != f->n || !prev_n) {
+        for (int i = 0; i < 4; i++) {
+            strncpy(ff[i].name, field_name[i], strlen(field_name[i]) + 1);
+            ff[i].len = get_dynamic_len(ff[i].name, max_len[i]);
         }
     }
 
-    return code;
+    /*Счётчик для итераций по файлам*/
+    int cnt = 0, fcnt = 0;
+
+    /* Размер шапки таблицы с учётом одной границы */
+    size_t header_size = 4;
+
+    /* h - heigth. Учитывает две горизонтальные границы, размер шапки и кол-во выоводимых элементов */
+    size_t h = 2 + header_size + f->n;
+
+    /* w - weigth. Учитывает длину полей из шапки и их границы*/
+    size_t w = 1;
+    for (int i = 0; i < 4; i++) {
+        w += ff[i].len;
+    }
+
+    for (size_t i = 0; i < h; i++) {
+        char id[10], size[15], date[11], filename[EXT_SIZE + NAME_SIZE + 1];
+        if (cnt < f->n && i > header_size) {
+
+            snprintf(id, 10, "%*d", (int)max_len[0], f->file[cnt].id);
+            snprintf(size, 15, "%.2lf", f->file[cnt].size);
+            snprintf(date, 11, "%02d/%02d/%d", f->file[cnt].creation_time.day, f->file[cnt].creation_time.month, f->file[cnt].creation_time.year);
+            snprintf(filename, EXT_SIZE + NAME_SIZE + 1, "%s.%s", f->file[cnt].name, f->file[cnt].extension);
+            cnt++;
+        }
+
+        for (size_t j = 0; j < w; j++) {
+
+            /* Отрисовка основных границ таблицы */
+            if ((!i || i == h - 1 || i == header_size) && (!j || j == w - 1 || j == get_w(ff, 4, j))) {
+                putchar('+');
+            } else if (!j || j == w - 1 || j == get_w(ff, 4, j)) {
+                putchar('|');
+            } else if (!i || i == h - 1 || i == header_size) {
+                putchar('-');
+
+            // } else if (fcnt < 4 && i == header_size >> 1 && j == sum(ff, fcnt) + get_offset(ff, fcnt, NULL)) {
+            //     printf("%s", ff[fcnt].name);
+            //     j += strlen(ff[fcnt++].name) - 1;
+        
+            /* Вывод названия полей */
+            } else if (i == header_size >> 1 && j == get_offset(ff, 0, NULL)) { // a >> 1 - Деление на два с помощью битовых операций (мегабыстро)
+                printf("%s", ff[0].name);
+                j += strlen(ff[0].name) - 1;
+
+            } else if (i == header_size >> 1 && j == sum(ff, 1) + get_offset(ff, 1, NULL)) { // Учитываем предущие корды и находим оффсет
+                printf("%s", ff[1].name);
+                j += strlen(ff[1].name) - 1;
+
+            } else if (i == header_size >> 1 && j == sum(ff, 2) + get_offset(ff, 2, NULL)) {
+                printf("%s", ff[2].name);
+                j += strlen(ff[2].name) - 1;
+
+            } else if (i == header_size >> 1 && j == sum(ff, 3) + get_offset(ff, 3, NULL)) {
+                printf("%s", ff[3].name);
+                j += strlen(ff[3].name) - 1;
+                
+            /* Вывод данных полей */
+            } else if (i > header_size && j == get_offset(ff, 0, id)) {
+                printf("%s", id);
+                j += strlen(id) - 1;
+
+            } else if (i > header_size && j == sum(ff, 1) + get_offset(ff, 1, filename)) {
+                printf("%s", filename);
+                j += strlen(filename) - 1;
+
+            } else if (i > header_size && j == sum(ff, 2) + get_offset(ff, 2, size)) {
+                printf("%s", size);
+                j += strlen(size) - 1;
+
+            } else if (i > header_size && j == sum(ff, 3) + get_offset(ff, 3, date)) {
+                printf("%s", date);
+                j += strlen(date) - 1;
+
+            } else {
+                putchar(' ');
+            }
+        }
+        putchar('\n');
+    }
+    printf("Общий размер файлов в папке: %.2lf\n\n", f->size);
+    prev_n = f->n;
 }
 
 char *get_error(const int code) {

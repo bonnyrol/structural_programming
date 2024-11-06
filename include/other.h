@@ -4,6 +4,6 @@
 #include "../include/main.h"
 
 int delete_file(Folder *f, const int i);
-int insert_file(Folder *f, const int i, const Fileinfo *item);
+int insert_file(Folder *f, const int i, Fileinfo *item);
 
 #endif /* OTHER_H_ */

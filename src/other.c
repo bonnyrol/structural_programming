@@ -23,7 +23,22 @@ int delete_file(Folder *f, const int i) {
     return success;
 }
 
-int insert_file(Folder *f, const int i, const Fileinfo *item) {
+int get_unique_id(const Folder *f) {
+
+    static int max_id = 0;
+
+    if (!max_id) {
+        for (int i = 0; i < f->n; i++) {
+            if (f->file[i].id > max_id) {
+                max_id = f->file[i].id;
+            }
+        }
+    }
+
+    return ++max_id;
+}
+
+int insert_file(Folder *f, const int i, Fileinfo *item) {
     
     if (!f || !item) {
         return incorrect_parameters;
@@ -32,6 +47,8 @@ int insert_file(Folder *f, const int i, const Fileinfo *item) {
     } else if (i < 0) {
         return bad_index;
     }
+
+    item->id = get_unique_id(f);
 
     if (!i) {
         memmove(f->file + 1, f->file, f->n * sizeof(Fileinfo));

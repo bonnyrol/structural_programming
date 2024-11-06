@@ -13,6 +13,7 @@ void print_date(const Date *d);
 void print_err(const char *msg);
 int print_file(const Fileinfo *file, const int i);
 int print_folder(const Folder *f);
+void print_folder2(const Folder *f);
 char *get_error(const int code);
 
 #endif /* DATA_IO_H_ */
