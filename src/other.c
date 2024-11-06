@@ -65,3 +65,13 @@ int insert_file(Folder *f, const int i, Fileinfo *item) {
 
     return success;
 }
+
+double get_sizes(const Folder *f) {
+    double result = 0.0f;
+
+    for (int i = 0; i < f->n; i++) {
+        result += f->file[i].size;
+    }
+
+    return result;
+}

@@ -5,5 +5,6 @@
 
 int delete_file(Folder *f, const int i);
 int insert_file(Folder *f, const int i, Fileinfo *item);
+double get_sizes(const Folder *f);
 
 #endif /* OTHER_H_ */

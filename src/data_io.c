@@ -16,7 +16,7 @@ int input(Folder *f, const int *i) {
 
     input_filename(&buff);
     input_size(&buff.size);
-    //input_date(&buff->creation_time);
+    input_date(&buff.creation_time);
     
     code = insert_file(f, (i) ? *i : f->n, &buff);
 
@@ -32,8 +32,8 @@ void input_filename(Fileinfo *file) {
         scanf("%s", buff);
         point = strrchr(buff, '.'); /* Сохранение адреса нахождения точки */
 
-        if (!point) { 
-            print_err("Неправильный формат ввода, пример: filename.ext.");
+        if (!point || !strlen(point + 1)) { 
+            print_err("Неправильный формат ввода, пример: filename.ext");
         } else if (((point - buff + 1) > NAME_SIZE) || (strlen(point + 1) > EXT_SIZE)) {
             print_err("Слишком длинное название или расширение.");
         } else if (strpbrk(buff, "/\\:*?\"<>|")) {
@@ -59,15 +59,13 @@ void input_size(double *size) {
 void input_date(Date *d) {
     int k = 0;
     while (1) {
-        printf("Введите дату создания файла: ");
-        k = scanf("%d.%d.%d", &d->day, &d->month, &d->year);
-        if (k != 3) {
+        printf("Введите дату создания файла (формат ДД.ММ.ГГГГ): ");
+        k = scanf("%02d.%02d.%d", &d->day, &d->month, &d->year);
+        if (k != 3 || check_date(d)) {
             print_err("Некорректный ввод, попробуй снова.");
-            continue;
-        } else if (check_date(d)) {
-            print_err("Дата создания файла не может быть больше чем текущая дата компьютера.");
+        } else {
+            break;
         }
-        break;
     }
 }
 
@@ -82,21 +80,17 @@ int check_date(const Date *d) {
         cur_year = 1;
     }
 
-    if (d->month < 1 || (d->month > now->tm_mon + 1 && cur_year)) {
+    if (d->month > 12 || d->month < 1 || (d->month > now->tm_mon + 1 && cur_year)) {
         result = 1;
     } else if (d->month == now->tm_mon + 1) {
         cur_mon = 1;
     }
 
-    if (d->day < 1 || (d->day > now->tm_mday && (cur_mon && cur_year))) {
+    if (d->day > ((d->month % 2) ? 31 : 30) || d->day < 1 || (d->day > now->tm_mday && (cur_mon && cur_year))) {
         result = 1;
     }
 
     return result;
-}
-
-void print_date(const Date *d) {
-    printf("%d.%d.%d\n", d->day, d->month, d->year);
 }
 
 void print_err(const char *msg) {
@@ -139,6 +133,7 @@ void print_folder2(const Folder *f) {
     const char field_name[4][11] = {"id", "filename", "file size", "created at"}; 
     static Field ff[4] = {0};
 
+    /* Если кол-во элементов изменилось, то переопределяем поля, иначе используем что есть */
     if (prev_n != f->n || !prev_n) {
         for (int i = 0; i < 4; i++) {
             strncpy(ff[i].name, field_name[i], strlen(field_name[i]) + 1);
@@ -163,8 +158,8 @@ void print_folder2(const Folder *f) {
 
     for (size_t i = 0; i < h; i++) {
         char id[10], size[15], date[11], filename[EXT_SIZE + NAME_SIZE + 1];
-        if (cnt < f->n && i > header_size) {
 
+        if (cnt < f->n && i > header_size) {
             snprintf(id, 10, "%*d", (int)max_len[0], f->file[cnt].id);
             snprintf(size, 15, "%.2lf", f->file[cnt].size);
             snprintf(date, 11, "%02d/%02d/%d", f->file[cnt].creation_time.day, f->file[cnt].creation_time.month, f->file[cnt].creation_time.year);
@@ -182,26 +177,10 @@ void print_folder2(const Folder *f) {
             } else if (!i || i == h - 1 || i == header_size) {
                 putchar('-');
 
-            // } else if (fcnt < 4 && i == header_size >> 1 && j == sum(ff, fcnt) + get_offset(ff, fcnt, NULL)) {
-            //     printf("%s", ff[fcnt].name);
-            //     j += strlen(ff[fcnt++].name) - 1;
-        
             /* Вывод названия полей */
-            } else if (i == header_size >> 1 && j == get_offset(ff, 0, NULL)) { // a >> 1 - Деление на два с помощью битовых операций (мегабыстро)
-                printf("%s", ff[0].name);
-                j += strlen(ff[0].name) - 1;
-
-            } else if (i == header_size >> 1 && j == sum(ff, 1) + get_offset(ff, 1, NULL)) { // Учитываем предущие корды и находим оффсет
-                printf("%s", ff[1].name);
-                j += strlen(ff[1].name) - 1;
-
-            } else if (i == header_size >> 1 && j == sum(ff, 2) + get_offset(ff, 2, NULL)) {
-                printf("%s", ff[2].name);
-                j += strlen(ff[2].name) - 1;
-
-            } else if (i == header_size >> 1 && j == sum(ff, 3) + get_offset(ff, 3, NULL)) {
-                printf("%s", ff[3].name);
-                j += strlen(ff[3].name) - 1;
+            } else if (fcnt < 4 && i == header_size >> 1 && j == sum(ff, fcnt) + get_offset(ff, fcnt, NULL)) {
+                printf("%s", ff[fcnt].name);
+                j += strlen(ff[fcnt].name) - 1, fcnt++;
                 
             /* Вывод данных полей */
             } else if (i > header_size && j == get_offset(ff, 0, id)) {
@@ -236,7 +215,7 @@ char *get_error(const int code) {
 
     switch (code) {
     case incorrect_parameters:
-        msg = "Функция не должна принимать NULL\n";
+        msg = "Функция принимает некорректные значения\n";
         break;
     case length_error:
         msg = "Выход за пределы массива\n";
@@ -244,6 +223,10 @@ char *get_error(const int code) {
     case bad_index:
         msg = "Некорректный индекс\n";
         break;
+    case bad_alloc:
+        msg = "Ошибка выделения памяти\n";
+        break;
+
     }
 
     return msg;

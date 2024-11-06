@@ -7,7 +7,7 @@
 
 typedef enum {name, ext, size, datetime} mode; /* флаги для обозначния сортировки по типу.*/
 typedef enum {ascending, descending} sorting; /* Флаги для обозначения сортировки по возрастанию или убыванию. */
-typedef enum {success, incorrect_parameters, length_error, bad_index} errors;
+typedef enum {success, incorrect_parameters, length_error, bad_index, bad_alloc} errors;
 
 typedef struct {
     int day, month, year;
