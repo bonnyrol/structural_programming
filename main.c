@@ -78,11 +78,11 @@ int entry(Folder *folder) {
     mode a = 0; // name
     sorting b = 0; // asc
 
-    print_folder2(folder);
+    print_folder(folder);
     menu();
     choise = input_int("Выберите пункт: ");
     cls();
-    print_folder2(folder);
+    print_folder(folder);
 
     switch (choise) {
     case 0:
