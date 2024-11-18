@@ -3,8 +3,8 @@
 
 #include "../include/main.h"
 
-int delete_file(Fileinfo *folder,  int *n, const int i);
-int get_total_size(const Fileinfo *folder, const int n, double *total);
-int insert_file(Fileinfo *folder, int *n, const int i, const Fileinfo *item);
+int delete_file(Folder *f, const int i);
+int insert_file(Folder *f, const int i, Fileinfo *item);
+double get_sizes(const Folder *f);
 
 #endif /* OTHER_H_ */

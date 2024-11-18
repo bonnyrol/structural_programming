@@ -11,21 +11,22 @@ void menu();
 /*Возвращает введённое целочисленное значение*/
 int input_int(char *msg);
 
-int entry(Fileinfo *folder, int *n);
+int entry(Folder *folder);
 
 
 int main() {
-    Fileinfo folder[MAX_FILES] = {{1, "game", "exe", 500, {12, 12, 2012}}, 
-                          {2, "secret", "txt", 23403, {16, 11, 2023}},
-                          {3, "my birthday", "jpeg", 321, {20, 8, 2005}},
-                          {4, "Отчёт по лабараторной работе №7", "docx", 110, {25, 3, 2024}},
-                          {5, "main", "c", 8, {1, 2, 2024}}};
+    Folder folder = {{{1, "game", "exe", 5300, {12, 12, 2012}}, 
+                     {2, "secret", "txt", 23403, {16, 11, 2023}},
+                     {3, "my birthday", "jpeg", 321, {20, 8, 2005}},
+                     {4, "test", "docx", 110, {25, 3, 2024}},
+                     {5, "main", "c", 8, {1, 2, 2024}}},
+                      5,
+                      get_sizes(&folder)};
 
 #ifdef _WIN
     system("chcp 65001 > NUL");
 #endif
-    int n = 5;
-    while(entry(folder, &n));
+    while(entry(&folder));
     
 #ifdef _WIN
     system("pause");
@@ -33,7 +34,6 @@ int main() {
 
     return 0;
 }
-
 
 void cls() {
 #ifdef _WIN
@@ -45,12 +45,9 @@ void cls() {
 
 void menu() {
     printf("1. Создать новый файл\n");
-    printf("2. Вывод всех файлов на экран\n");
-    printf("3. Вывод файла на экран по индексу\n");
-    printf("4. Подсчёт всех элементов в списке\n");
-    printf("5. Сортировка файлов\n");
-    printf("6. Вставка файла в любое место\n");
-    printf("7. Удаление файла\n");
+    printf("2. Вставка файла в любое место\n");
+    printf("3. Сортировка файлов\n");
+    printf("4. Удаление файла\n");
     printf("0. Выход из программы\n");
 }
 
@@ -75,15 +72,17 @@ int input_int(char *msg) {
     return (int)buff;
 }
 
-int entry(Fileinfo *folder, int *n) {
+int entry(Folder *folder) {
     int code = 1, choise = 0, value = 0;
     int error_code = 0;
-    double total = 0;
-    // char ch = '\0';
+    mode a = 0; // name
+    sorting b = 0; // asc
 
+    print_folder2(folder);
     menu();
     choise = input_int("Выберите пункт: ");
     cls();
+    print_folder2(folder);
 
     switch (choise) {
     case 0:
@@ -91,39 +90,30 @@ int entry(Fileinfo *folder, int *n) {
         code = 0;
         break;
     case 1:
-        error_code = input(folder, n, NULL);
+        error_code = input(folder, NULL);
         print_err(get_error(error_code));
         break;
     case 2:
-        if (print_folder(folder, *n)) {
-            print_err("Пустая папка");
-        }
-        break;
-    case 3:
-        value = input_int("Введите индекс для вывода файла: ");
-        if (print_file(folder, *n, value)) {
-            print_err("Файл с таким индексом отстутсвует в папке");
-        }
-        break;
-    case 4:
-        error_code = get_total_size(folder, *n, &total);
-        if (error_code == success) {
-            printf("Размер всех файлов в папке: %.2lf\n", total);
-        } else {
-            print_err(get_error(error_code));
-        }
-        break;
-    case 5:
-        printf("Сортировка\n");
-        break;
-    case 6:
         value = input_int("Введите индекс для вставки: ");
-        error_code = input(folder, n, &value);
+        error_code = input(folder, &value);
         print_err(get_error(error_code));
         break;
-    case 7:
+    case 3:
+        a = input_int("Введите параметры для сортитровки.\n\
+        0) Имя файла\n\
+        1) Расширение файла\n\
+        2) Размер\n\
+        3) Дата создания\n\
+        Выбор:  ");
+        b = input_int("Как сортировать?.\n\
+        0) По возрастанию\n\
+        1) По убыванию\n\
+        Выбор: ");
+        sort(folder, a, b);
+        break;
+    case 4:
         value = input_int("Введите индекс для удаления: ");
-        error_code = delete_file(folder, n, value);
+        error_code = delete_file(folder, value);
         print_err(get_error(error_code));
         break;
     default:
@@ -131,51 +121,10 @@ int entry(Fileinfo *folder, int *n) {
         break;
     }
 
-    //printf("Press enter to countinue...\n");
+    // char ch;
     // while ((ch = getchar()) != '\n' && ch != EOF);
-    // getchar();
-    // cls();
+    getchar();
+    cls();
 
     return code;
 }
-
-// int main() {
-//     int i;
-//     /* Fileinfo folder[MAX_FILES] = {0}; */
-//     Fileinfo folder2[5] = {{1, "game", "exe", 500, {12, 12, 2012}}, 
-//                           {2, "secret", "txt", 23403, {16, 11, 2023}},
-//                           {3, "my birthday", "jpeg", 321, {20, 8, 2005}},
-//                           {4, "Отчёт по лабараторной работе №7", "docx", 110, {25, 3, 2024}},
-//                           {5, "main", "c", 8, {1, 2, 2024}}};
-//     /* Fileinfo *a = &folder[0]; */
-//     double total_size = 0;
-// #ifdef _WIN64
-//     system("chcp 65001 > NUL");
-// #endif
-
-    
-//     for(i = 0; i < 5; i++) {
-//         printf("File №%d:\n", i + 1);
-//         printf("Name: %s.%s\n", folder2[i].name, folder2[i].extension);
-//         printf("Size: %.2lf\n", folder2[i].size);
-//         print_date(&folder2[i].creation_time);
-//         putchar('\n');
-//     }
-    
-//     printf("Sorting...\n");
-//     putchar('\n');
-//     sort(folder2, 5, size, ascending);
-
-//     for(i = 0; i < 5; i++) {
-//         printf("File №%d:\n", i + 1);
-//         printf("Name: %s.%s\n", folder2[i].name, folder2[i].extension);
-//         printf("Size: %.2lf\n", folder2[i].size);
-//         print_date(&folder2[i].creation_time);
-//         putchar('\n');
-//     }
-//     /* printf("1: %s 2: %s\n", folder2[0].name, folder2[1].name); */
-//     printf("size: %.2lf\n", total_size);
-
-//     return 0;
-// }
-

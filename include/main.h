@@ -7,7 +7,7 @@
 
 typedef enum {name, ext, size, datetime} mode; /* флаги для обозначния сортировки по типу.*/
 typedef enum {ascending, descending} sorting; /* Флаги для обозначения сортировки по возрастанию или убыванию. */
-typedef enum {success, incorrect_parameters, length_error, bad_index} errors;
+typedef enum {success, incorrect_parameters, length_error, bad_index, bad_alloc} errors;
 
 typedef struct {
     int day, month, year;
@@ -20,6 +20,13 @@ typedef struct {
     double size; /* Размер файла в КБ */
     Date creation_time; /* Дата создания */
 } Fileinfo;
+
+typedef struct {
+    Fileinfo file[MAX_FILES];
+    int n;
+    double size;
+} Folder;
+
 
 #include "data_io.h"
 #include "sorting.h"

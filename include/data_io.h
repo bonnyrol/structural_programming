@@ -4,15 +4,16 @@
 #include <string.h>
 #include "main.h"
 
-int input(Fileinfo *folder, int *n, const int *i);
+int input(Folder *f, const int *i);
 void input_filename(Fileinfo *file);
 void input_size(double *size);
 void input_date(Date *d);
 int check_date(const Date *d);
 void print_date(const Date *d);
 void print_err(const char *msg);
-int print_file(const Fileinfo* folder, const int n, const int i);
-int print_folder(const Fileinfo *folder, const int n);
+int print_file(const Fileinfo *file, const int i);
+int print_folder(const Folder *f);
+void print_folder2(const Folder *f);
 char *get_error(const int code);
 
 #endif /* DATA_IO_H_ */

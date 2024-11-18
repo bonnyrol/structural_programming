@@ -9,10 +9,6 @@ OBJECTS = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.c=.o)))
 
 all: $(EXEC)
 
-run:
-	@$(CC) test.c -lncurses
-	@./a.out
-
 $(EXEC): $(OBJDIR) $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) main.c -o $(EXEC)
 
@@ -28,6 +24,6 @@ $(OBJDIR):
 rebuild: clean $(EXEC)
 
 clean:
-	rm -rf *.o
-	rm -rf $(EXEC)
+	rm -f *.o
+	rm -f $(EXEC)
 	rm -rf $(OBJDIR)
