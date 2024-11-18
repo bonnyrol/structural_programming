@@ -101,7 +101,7 @@ void print_err(const char *msg) {
     }
 }
 
-void print_folder2(const Folder *f) {
+void print_folder(const Folder *f) {
 
     /* Данная переменная служит для отслеживания изменений в f */
     static int prev_n = 0;
