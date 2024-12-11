@@ -31,7 +31,7 @@ typedef struct {
 } Fileinfo;
 
 typedef struct {
-    Fileinfo file[MAX_FILES];
+    Fileinfo *file;
     int n;
     double size;
 } Folder;

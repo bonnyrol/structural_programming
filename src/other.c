@@ -1,6 +1,7 @@
 #include "../include/other.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int delete_file(Folder *f, const int i) {
 
@@ -45,11 +46,13 @@ int insert_file(Folder *f, const int i, Fileinfo *item) {
     
     if (!f || !item) {
         return incorrect_parameters;
-    } else if (f->n + 1 > MAX_FILES) {
-        return length_error;
+    // } else if (f->n + 1 > MAX_FILES) {
+    //     return length_error;
     } else if (i < 0) {
         return bad_index;
     }
+    
+
 
     item->id = get_unique_id(f);
 
@@ -170,3 +173,38 @@ int load_from_file(Folder *f, const char *filename) {
 
     return code;
 }
+
+
+int allocate(Folder *f) {
+    if (!f) {
+        return incorrect_parameters;
+    }
+
+    int code = success;
+
+    if (!f->n) {
+        f->n = 1, f->file = NULL;
+        f->file = calloc(f->n, sizeof(Fileinfo));
+        if (!f->file) {
+            code = bad_alloc;
+        }
+    } else {
+        Fileinfo *temp = NULL;
+
+
+        temp = realloc(f->file, f->n + 1);
+        if (temp) {
+            f->file = temp;
+            f->n++;
+        } else {
+            code = bad_alloc;
+        }
+    }
+
+    return code;
+}
+
+// void freemem(Folder *f) {
+//     free(f->file);
+//     f->n = 0, f->size = 0;
+// }

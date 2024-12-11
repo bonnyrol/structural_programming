@@ -14,13 +14,14 @@ int input_int(char *msg);
 int entry(Folder *folder);
 
 int main() {
-    Folder folder = {{{1, "game", "exe", 5300, {12, 12, 2012}}, 
-                     {2, "secret", "txt", 23403, {16, 11, 2023}},
-                     {3, "my birthday", "jpeg", 321, {20, 8, 2005}},
-                     {4, "test", "docx", 110, {25, 3, 2024}},
-                     {5, "main", "c", 8, {1, 2, 2024}}},
-                      5,
-                      get_sizes(&folder)};
+    // Folder folder = {{{1, "game", "exe", 5300, {12, 12, 2012}}, 
+    //                  {2, "secret", "txt", 23403, {16, 11, 2023}},
+    //                  {3, "my birthday", "jpeg", 321, {20, 8, 2005}},
+    //                  {4, "test", "docx", 110, {25, 3, 2024}},
+    //                  {5, "main", "c", 8, {1, 2, 2024}}},
+    //                   5,
+    //                   get_sizes(&folder)};
+    Folder folder = {0};
 
 #ifdef _WIN
     system("chcp 65001 > NUL");
@@ -91,6 +92,7 @@ int entry(Folder *folder) {
     switch (choise) {
     case 0:
         printf("Выход из программы...\n");
+        free(folder->file);
         code = 0;
         break;
     case 1:
