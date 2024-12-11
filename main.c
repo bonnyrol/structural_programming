@@ -13,7 +13,6 @@ int input_int(char *msg);
 
 int entry(Folder *folder);
 
-
 int main() {
     Folder folder = {{{1, "game", "exe", 5300, {12, 12, 2012}}, 
                      {2, "secret", "txt", 23403, {16, 11, 2023}},
@@ -26,6 +25,7 @@ int main() {
 #ifdef _WIN
     system("chcp 65001 > NUL");
 #endif
+
     while(entry(&folder));
     
 #ifdef _WIN
@@ -48,6 +48,9 @@ void menu() {
     printf("2. Вставка файла в любое место\n");
     printf("3. Сортировка файлов\n");
     printf("4. Удаление файла\n");
+    printf("5. Сохранить данные в файл\n");
+    printf("6. Загрузить из файла\n");
+    printf("7. Очистить данные\n");
     printf("0. Выход из программы\n");
 }
 
@@ -75,6 +78,7 @@ int input_int(char *msg) {
 int entry(Folder *folder) {
     int code = 1, choise = 0, value = 0;
     int error_code = 0;
+    char buff[NAME_SIZE + EXT_SIZE + 1];
     mode a = 0; // name
     sorting b = 0; // asc
 
@@ -116,10 +120,27 @@ int entry(Folder *folder) {
         error_code = delete_file(folder, value);
         print_err(get_error(error_code));
         break;
+    case 5:
+        printf("Введите название файла для сохранения: ");
+        scanf("%s", buff);
+        error_code = save_to_file(folder, buff);
+        print_err(get_error(error_code));
+        break;
+    case 6:
+        printf("Введите названия файла для загрузки данных: ");
+        scanf("%s", buff);
+        error_code = load_from_file(folder, buff);
+        print_err(get_error(error_code));
+        break;
+    case 7:
+        clear_all(folder);
+        break;
+
     default:
         print_err("Такого пункта меню нет, попробуй снова");
         break;
     }
+    
 
     // char ch;
     // while ((ch = getchar()) != '\n' && ch != EOF);

@@ -6,5 +6,8 @@
 int delete_file(Folder *f, const int i);
 int insert_file(Folder *f, const int i, Fileinfo *item);
 double get_sizes(const Folder *f);
+void clear_all(Folder *f);
+int save_to_file(const Folder *f, const char *filename);
+int load_from_file(Folder *f, const char *filename);
 
 #endif /* OTHER_H_ */

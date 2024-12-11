@@ -24,29 +24,45 @@ int input(Folder *f, const int *i) {
 }
 
 void input_filename(Fileinfo *file) {
-    char *point = NULL;
-    char buff[NAME_SIZE + EXT_SIZE];
 
-    while (1) {
+    char buff[NAME_SIZE + EXT_SIZE + 2];
+    char restr[12] = {0};
+    snprintf(restr, 12, "%%%ds", NAME_SIZE + EXT_SIZE + 2);
+
+    int code = 0;
+    do {
+
         printf("Введите имя и расширение файла: ");
-        scanf("%s", buff);
-        point = strrchr(buff, '.'); /* Сохранение адреса нахождения точки */
+        scanf(restr, buff);
 
-        if (!point || !strlen(point + 1)) { 
-            print_err("Неправильный формат ввода, пример: filename.ext");
-        } else if (((point - buff + 1) > NAME_SIZE) || (strlen(point + 1) > EXT_SIZE)) {
-            print_err("Слишком длинное название или расширение.");
-        } else if (strpbrk(buff, "/\\:*?\"<>|")) {
-            print_err("Имя или расширение файла не может содержать спец.символы.");
-        } else {
+        code = check_filename(buff);
+
+        if (!code) {
+            char *point = strrchr(buff, '.');
             *point++ = '\0';
             strncpy(file->name, buff, point - buff);
             strcpy(file->extension, point);
-            break;
+        } else {
+            print_err(get_error(code));
         }
 
-    }
+    } while (code);
 
+}
+
+int check_filename(const char *fn) {
+    int code = success;
+    char *point = strrchr(fn, '.'); /* Сохранение адреса нахождения точки */
+
+    if (!point || !strlen(point + 1)) { 
+        code = filename_format;
+    } else if (((point - fn + 1) > NAME_SIZE) || (strlen(point + 1) > EXT_SIZE)) {
+        code = filename_length;
+    } else if (strpbrk(fn, "/\\:*?\"<>|")) {
+        code = filename_wrong_symbol;
+    }
+    
+    return code;
 }
 
 void input_size(double *size) {
@@ -226,7 +242,18 @@ char *get_error(const int code) {
     case bad_alloc:
         msg = "Ошибка выделения памяти\n";
         break;
-
+    case fopen_error:
+        msg = "Не удалось открыть файл\n";
+        break;
+    case filename_format:
+        msg = "Неправильный формат ввода, пример: filename.ext\n";
+        break;
+    case filename_length:
+        msg = "Слишком длинное название или расширение.\n";
+        break;
+    case filename_wrong_symbol:
+        msg = "Имя или расширение файла не может содержать спец.символы.\n";
+        break;
     }
 
     return msg;

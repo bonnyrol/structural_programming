@@ -9,6 +9,7 @@ void input_filename(Fileinfo *file);
 void input_size(double *size);
 void input_date(Date *d);
 int check_date(const Date *d);
+int check_filename(const char *fn);
 void print_err(const char *msg);
 void print_folder(const Folder *f);
 char *get_error(const int code);

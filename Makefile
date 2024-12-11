@@ -26,4 +26,5 @@ rebuild: clean $(EXEC)
 clean:
 	rm -f *.o
 	rm -f $(EXEC)
+	rm -f *.db
 	rm -rf $(OBJDIR)

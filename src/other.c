@@ -1,5 +1,6 @@
 #include "../include/other.h"
 #include <string.h>
+#include <stdio.h>
 
 int delete_file(Folder *f, const int i) {
 
@@ -10,6 +11,8 @@ int delete_file(Folder *f, const int i) {
     } else if (i < 0 || i >= f->n) {
         return bad_index;
     }
+    
+    // memset(&f->file[i], 0, sizeof(Fileinfo));
 
     f->size -= f->file[i].size;
 
@@ -74,4 +77,96 @@ double get_sizes(const Folder *f) {
     }
 
     return result;
+}
+
+void clear_all(Folder *f) {
+    int n = f->n;
+    for (int i = 0; i < n; i++) {
+        delete_file(f, 0);
+    }
+}
+
+int save_to_file(const Folder *f, const char *filename) {
+    if (!f || !filename) {
+        return incorrect_parameters;
+    }
+
+    int code = success;
+
+    FILE *fp = NULL;
+
+    fp = fopen(filename, "wb");
+
+    if (!fp) {
+        return fopen_error;
+    } else {
+
+        fwrite(&f->n, sizeof(f->n), 1, fp);
+        fwrite(f->file, sizeof(Fileinfo), f->n, fp);
+
+        fclose(fp);
+    }
+
+    return code;
+}
+
+
+int load_from_file(Folder *f, const char *filename) {
+
+    if (!f || !filename) {
+        return incorrect_parameters;
+    }
+
+    int code = success;
+    
+    FILE *bin = NULL;
+    
+    bin = fopen(filename, "rb");
+            long file_size = 0;
+    if (bin) {
+        
+        int new_n = 0;
+        fread(&new_n, sizeof(f->n), 1, bin);
+
+        if (new_n <= MAX_FILES && new_n > 0) {
+
+            fseek(bin, 0, SEEK_END);
+            file_size = ftell(bin);
+            if (!(file_size - sizeof(f->n) - sizeof(Fileinfo) * new_n)) {
+                fseek(bin, sizeof(f->n), SEEK_SET);
+                fread(f->file, sizeof(Fileinfo), new_n, bin);
+
+                // int cnt = 0;
+
+                f->n = new_n;
+                // for (int i = 0; i < new_n; i++) {
+                //     char buff[NAME_SIZE + EXT_SIZE + 2] = {'\0'};
+                //     snprintf(buff, NAME_SIZE + EXT_SIZE + 2, "%s.%s", f->file[i].name, f->file[i].extension);
+                //     if (check_date(&f->file[i].creation_time) || check_filename(buff) || f->file[i].size < 0) {
+                //         delete_file(f, i - cnt);
+                //         cnt++;
+                //     }
+                // }
+                
+
+                f->size = get_sizes(f);
+
+
+            } else {
+                code = fcorrupt;
+            }
+
+        } else {
+            code = length_error;
+        }
+
+        // printf("n: %d, size: %ld\n", new_n, file_size);
+        fclose(bin);
+
+    } else {
+        code = fopen_error;
+
+    }
+
+    return code;
 }

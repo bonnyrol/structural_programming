@@ -1,13 +1,22 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define MAX_FILES 6
+#define MAX_FILES 20
 #define EXT_SIZE 5
 #define NAME_SIZE 100
 
 typedef enum {name, ext, size, datetime} mode; /* флаги для обозначния сортировки по типу.*/
 typedef enum {ascending, descending} sorting; /* Флаги для обозначения сортировки по возрастанию или убыванию. */
-typedef enum {success, incorrect_parameters, length_error, bad_index, bad_alloc} errors;
+typedef enum {success,
+ incorrect_parameters,
+  length_error,
+   bad_index,
+    bad_alloc,
+     fopen_error,
+      fcorrupt,
+      filename_format,
+      filename_length,
+      filename_wrong_symbol} errors;
 
 typedef struct {
     int day, month, year;
