@@ -12,8 +12,16 @@ int delete_file(Folder *f, const int i) {
     } else if (i < 0 || i >= f->n) {
         return bad_index;
     }
+
+    int code = success;
     
     // memset(&f->file[i], 0, sizeof(Fileinfo));
+
+    /* TODO: выделить копирование в отдельную функцию */
+    // Folder temp = {0};
+    // allocate(&temp, f->n);
+    // memcpy(temp.file, f->file, sizeof(Fileinfo) * f->n);
+    // temp.size = f->size, temp.n = f->n;
 
     f->size -= f->file[i].size;
 
@@ -24,7 +32,36 @@ int delete_file(Folder *f, const int i) {
     }
 
     f->n--;
-    return success;
+    if (!f->n) {
+        free(f->file), f->file = NULL;
+    } else {
+        Fileinfo *temp = NULL;
+        temp = realloc(f->file, f->n * sizeof(Fileinfo));
+        if (temp) {
+            free(f->file);
+            f->file = temp;
+        }
+    }
+
+    // temp.n--;
+    // Fileinfo *t = NULL;
+    // if (temp.n) {
+    //     t = realloc(temp.file, temp.n * sizeof(Fileinfo));
+    //     if (t) {
+    //         temp.file = t;
+    //         free(f->file);
+    //         *f = temp;
+    //     } else {
+    //         code = bad_alloc;
+    //     }
+    // } else {
+    //     free(f->file);
+    //     free(temp.file);
+    //     f->file = NULL, f->n = 0, f->size = 0;
+    // }
+
+
+    return code;
 }
 
 int get_unique_id(const Folder *f) {
@@ -50,25 +87,22 @@ int insert_file(Folder *f, const int i, Fileinfo *item) {
     //     return length_error;
     } else if (i < 0) {
         return bad_index;
-    } else if (allocate(f, 1)) {
+    } else if (allocate(f, f->n + 1)) {
         return bad_alloc;
     }
     
-
-
     item->id = get_unique_id(f);
 
     if (!i) {
-        memmove(f->file + 1, f->file, f->n * sizeof(Fileinfo));
+        memmove(f->file + 1, f->file, (f->n - 1) * sizeof(Fileinfo));
         f->file[i] = *item;
-    } else if (i >= f->n) {
-        f->file[f->n] = *item;
+    } else if (i >= f->n - 1) {
+        f->file[f->n - 1] = *item;
     } else {
-        memmove(f->file + i + 1, f->file + i, (f->n - i) * sizeof(Fileinfo));
+        memmove(f->file + i + 1, f->file + i, (f->n - i - 1) * sizeof(Fileinfo));
         f->file[i] = *item;
     }
 
-    f->n++;
     f->size += item->size;
 
     return success;
@@ -141,7 +175,7 @@ int load_from_file(Folder *f, const char *filename) {
                 fseek(bin, sizeof(f->n), SEEK_SET);
 
                 Folder new = {0};
-                new.file = NULL;
+                // new.file = NULL;
 
                 if (!allocate(&new, new_n)) {
                     fread(new.file, sizeof(Fileinfo), new_n, bin);
@@ -197,30 +231,20 @@ int allocate(Folder *f, const int n) {
 
     int code = success;
 
+    Fileinfo *temp = NULL;
+
     if (!f->file) {
-        f->file = calloc(n, sizeof(Fileinfo));
-        if (!f->file) {
-            code = bad_alloc;
-        } else {
-            f->n = n;
-        }
+        temp = calloc(n, sizeof(Fileinfo));
     } else {
-        Fileinfo *temp = NULL;
+        temp = realloc(f->file, n * sizeof(Fileinfo));
+    }
 
-
-        temp = realloc(f->file, n);
-        if (temp) {
-            f->file = temp;
-            f->n = n;
-        } else {
-            code = bad_alloc;
-        }
+    if (temp) {
+        f->file = temp;
+        f->n = n;
+    } else {
+        code = bad_alloc;
     }
 
     return code;
 }
-
-// void freemem(Folder *f) {
-//     free(f->file);
-//     f->n = 0, f->size = 0;
-// }

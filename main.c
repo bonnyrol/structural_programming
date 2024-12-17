@@ -137,7 +137,6 @@ int entry(Folder *folder) {
     case 7:
         clear_all(folder);
         break;
-
     default:
         print_err("Такого пункта меню нет, попробуй снова");
         break;
