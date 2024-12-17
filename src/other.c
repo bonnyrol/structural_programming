@@ -50,6 +50,8 @@ int insert_file(Folder *f, const int i, Fileinfo *item) {
     //     return length_error;
     } else if (i < 0) {
         return bad_index;
+    } else if (allocate(f, 1)) {
+        return bad_alloc;
     }
     
 
@@ -131,17 +133,31 @@ int load_from_file(Folder *f, const char *filename) {
         int new_n = 0;
         fread(&new_n, sizeof(f->n), 1, bin);
 
-        if (new_n <= MAX_FILES && new_n > 0) {
+        if (new_n > 0) {
 
             fseek(bin, 0, SEEK_END);
             file_size = ftell(bin);
             if (!(file_size - sizeof(f->n) - sizeof(Fileinfo) * new_n)) {
                 fseek(bin, sizeof(f->n), SEEK_SET);
-                fread(f->file, sizeof(Fileinfo), new_n, bin);
 
+                Folder new = {0};
+                new.file = NULL;
+
+                if (!allocate(&new, new_n)) {
+                    fread(new.file, sizeof(Fileinfo), new_n, bin);
+                    new.n = new_n, new.size = get_sizes(&new);
+                    free(f->file);
+                    *f = new;
+                } else {
+                    code = bad_alloc;
+                }
+
+
+                
+                
                 // int cnt = 0;
+                // allocate(&new, new_n);
 
-                f->n = new_n;
                 // for (int i = 0; i < new_n; i++) {
                 //     char buff[NAME_SIZE + EXT_SIZE + 2] = {'\0'};
                 //     snprintf(buff, NAME_SIZE + EXT_SIZE + 2, "%s.%s", f->file[i].name, f->file[i].extension);
@@ -152,7 +168,6 @@ int load_from_file(Folder *f, const char *filename) {
                 // }
                 
 
-                f->size = get_sizes(f);
 
 
             } else {
@@ -175,27 +190,28 @@ int load_from_file(Folder *f, const char *filename) {
 }
 
 
-int allocate(Folder *f) {
-    if (!f) {
+int allocate(Folder *f, const int n) {
+    if (!f || n < 0) {
         return incorrect_parameters;
     }
 
     int code = success;
 
-    if (!f->n) {
-        f->n = 1, f->file = NULL;
-        f->file = calloc(f->n, sizeof(Fileinfo));
+    if (!f->file) {
+        f->file = calloc(n, sizeof(Fileinfo));
         if (!f->file) {
             code = bad_alloc;
+        } else {
+            f->n = n;
         }
     } else {
         Fileinfo *temp = NULL;
 
 
-        temp = realloc(f->file, f->n + 1);
+        temp = realloc(f->file, n);
         if (temp) {
             f->file = temp;
-            f->n++;
+            f->n = n;
         } else {
             code = bad_alloc;
         }

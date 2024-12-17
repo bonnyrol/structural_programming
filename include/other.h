@@ -9,5 +9,6 @@ double get_sizes(const Folder *f);
 void clear_all(Folder *f);
 int save_to_file(const Folder *f, const char *filename);
 int load_from_file(Folder *f, const char *filename);
+int allocate(Folder *f, const int n);
 
 #endif /* OTHER_H_ */
