@@ -7,8 +7,6 @@ int input(Folder *f, const int *i) {
 
     if (!f) {
         return incorrect_parameters;
-    } else if (f->n >= MAX_FILES) {
-        return length_error;
     }
 
     Fileinfo buff = {0};

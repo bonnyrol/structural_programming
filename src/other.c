@@ -14,14 +14,6 @@ int delete_file(Folder *f, const int i) {
     }
 
     int code = success;
-    
-    // memset(&f->file[i], 0, sizeof(Fileinfo));
-
-    /* TODO: выделить копирование в отдельную функцию */
-    // Folder temp = {0};
-    // allocate(&temp, f->n);
-    // memcpy(temp.file, f->file, sizeof(Fileinfo) * f->n);
-    // temp.size = f->size, temp.n = f->n;
 
     f->size -= f->file[i].size;
 
@@ -42,24 +34,6 @@ int delete_file(Folder *f, const int i) {
             f->file = temp;
         }
     }
-
-    // temp.n--;
-    // Fileinfo *t = NULL;
-    // if (temp.n) {
-    //     t = realloc(temp.file, temp.n * sizeof(Fileinfo));
-    //     if (t) {
-    //         temp.file = t;
-    //         free(f->file);
-    //         *f = temp;
-    //     } else {
-    //         code = bad_alloc;
-    //     }
-    // } else {
-    //     free(f->file);
-    //     free(temp.file);
-    //     f->file = NULL, f->n = 0, f->size = 0;
-    // }
-
 
     return code;
 }
@@ -83,8 +57,6 @@ int insert_file(Folder *f, const int i, Fileinfo *item) {
     
     if (!f || !item) {
         return incorrect_parameters;
-    // } else if (f->n + 1 > MAX_FILES) {
-    //     return length_error;
     } else if (i < 0) {
         return bad_index;
     } else if (allocate(f, f->n + 1)) {
@@ -175,7 +147,6 @@ int load_from_file(Folder *f, const char *filename) {
                 fseek(bin, sizeof(f->n), SEEK_SET);
 
                 Folder new = {0};
-                // new.file = NULL;
 
                 if (!allocate(&new, new_n)) {
                     fread(new.file, sizeof(Fileinfo), new_n, bin);
@@ -185,25 +156,6 @@ int load_from_file(Folder *f, const char *filename) {
                 } else {
                     code = bad_alloc;
                 }
-
-
-                
-                
-                // int cnt = 0;
-                // allocate(&new, new_n);
-
-                // for (int i = 0; i < new_n; i++) {
-                //     char buff[NAME_SIZE + EXT_SIZE + 2] = {'\0'};
-                //     snprintf(buff, NAME_SIZE + EXT_SIZE + 2, "%s.%s", f->file[i].name, f->file[i].extension);
-                //     if (check_date(&f->file[i].creation_time) || check_filename(buff) || f->file[i].size < 0) {
-                //         delete_file(f, i - cnt);
-                //         cnt++;
-                //     }
-                // }
-                
-
-
-
             } else {
                 code = fcorrupt;
             }
@@ -212,7 +164,6 @@ int load_from_file(Folder *f, const char *filename) {
             code = length_error;
         }
 
-        // printf("n: %d, size: %ld\n", new_n, file_size);
         fclose(bin);
 
     } else {
